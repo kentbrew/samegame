@@ -30,20 +30,20 @@ const config = {
     { x: -1, y: 0 }
   ]
 },
-// a place for globals that will change throughout the game
+// globals that can change throughout the game (start function adds more)
 me = {
   // how many colors do you want on the board?
   difficulty: 3
 },
-// all dots are gone
+// all dots gone? we win!
 win = () => {
   me.done = true;
-  me.text = `Winner! Score: ${me.score} Up to play again`;
+  me.text = `Winner! Score: ${me.score}. Up to play again`;
 },
-// all moves are gone
+// all moves gone? we lose.
 fail = () => {
   me.done = true;
-  me.text = `Game over. Score: ${me.score} Up to play again`;
+  me.text = `Game over. Score: ${me.score}. Up to play again`;
 },
 // find and return all neighbors for a location
 nearby = (x, y) => {
@@ -68,11 +68,10 @@ nearby = (x, y) => {
 // to run these, enter test("something") in console
 test = (condition) => {
   let temp = new Array(config.dim * config.dim).fill(config.empty);
-
   switch(condition) {
     case "win":
       temp[config.dim - 2] = config.colors[1];
-      temp[config.dim -1] = config.colors[1];
+      temp[config.dim - 1] = config.colors[1];
       me.data = temp;
       me.text = "Testing win; make a move.";
       me.score = 8675309;
@@ -80,7 +79,7 @@ test = (condition) => {
     case "fail":
       temp[config.dim - 3] = config.colors[1];
       temp[config.dim - 2] = config.colors[1];
-      temp[config.dim -1] = config.colors[2];
+      temp[config.dim - 1] = config.colors[2];
       me.data = temp;
       me.text = "Testing fail; make a move.";
       me.score = 666;
@@ -102,7 +101,7 @@ check = () => {
     win();
     return;
   }
-  // do we have any moves?
+  // if we're still here we did not win. Do we have any moves left?
   let found = false;
   me.data.filter((color, index) => {
     // don't check empty spaces
@@ -191,10 +190,8 @@ collapse = () => {
   }, 
   // take a snapshot of game data to work with
   temp = [...me.data];
-
   // recurse until all empty cells have been collapsed
   grind();
-
   // if the game is still on, update the score
   if (!me.done) {
     me.text = "Score: " + me.score;
@@ -247,11 +244,13 @@ onDotClicked = (x, y) => {
     });
   }
 },
-// restart on Up arrow
+// valid keys are up, down, right, and left
 onKeyPress = (direction) => {
+  // restart on current difficulty
   if (direction === Direction.Up) {
     start();
   }
+  // decrease difficulty and restart
   if (direction === Direction.Left) {
     me.difficulty = me.difficulty - 1;
     if (me.difficulty < 2) {
@@ -259,6 +258,7 @@ onKeyPress = (direction) => {
     }
     start();
   }
+  // increase difficulty and restart
   if (direction === Direction.Right) {
     me.difficulty = me.difficulty + 1;
     if (me.difficulty > 6) {
